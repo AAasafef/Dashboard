@@ -18,80 +18,70 @@ class CiantisBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark =
-        ThemeData.estimateBrightnessForColor(surfaceColor) == Brightness.dark;
-    final iconColor = isDark
-        ? const Color(0xFFF0D4A5)
-        : const Color(0xFF746C60);
+    const gold = Color(0xFFE5C28A);
 
     return IgnorePointer(
       ignoring: !visible,
       child: AnimatedSlide(
-        duration: const Duration(milliseconds: 240),
+        duration: const Duration(milliseconds: 220),
         curve: Curves.easeOutCubic,
-        offset: visible ? Offset.zero : const Offset(0, 1.35),
+        offset: visible ? Offset.zero : const Offset(0, 1.25),
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 180),
           opacity: visible ? 1 : 0,
           child: Container(
-            height: 62,
-            margin: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+            height: 64,
+            margin: EdgeInsets.zero,
+            padding: const EdgeInsets.symmetric(horizontal: 18),
             decoration: BoxDecoration(
-              color: imageBackground ? null : surfaceColor.withValues(alpha: 0.96),
               gradient: imageBackground
                   ? LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        surfaceColor.withValues(alpha: 0.42),
-                        surfaceColor.withValues(alpha: 0.86),
+                        surfaceColor.withValues(alpha: 0.60),
+                        surfaceColor.withValues(alpha: 0.94),
                       ],
                     )
                   : null,
-              borderRadius: BorderRadius.circular(25),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 12,
-                  offset: const Offset(0, 5),
-                  color: Colors.black.withValues(alpha: 0.045),
-                ),
-              ],
+              color: imageBackground ? null : surfaceColor,
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _NavItem(
+                _NavIcon(
                   icon: Icons.crop_square_rounded,
                   index: 0,
                   currentIndex: currentIndex,
-                  color: iconColor,
+                  color: gold,
                   onTap: onTap,
                 ),
-                _NavItem(
+                _NavIcon(
                   icon: Icons.calendar_month_outlined,
                   index: 1,
                   currentIndex: currentIndex,
-                  color: iconColor,
+                  color: gold,
                   onTap: onTap,
                 ),
-                _CenterGridButton(
-                  color: iconColor,
-                  surfaceColor: surfaceColor,
+                _CenterButton(
                   selected: currentIndex == 2,
+                  color: gold,
+                  surfaceColor: surfaceColor,
                   onTap: () => onTap(2),
                 ),
-                _NavItem(
+                _NavIcon(
                   icon: Icons.article_outlined,
                   index: 3,
                   currentIndex: currentIndex,
-                  color: iconColor,
+                  color: gold,
                   onTap: onTap,
                 ),
-                _NavItem(
+                _NavIcon(
                   icon: Icons.settings_outlined,
                   index: 4,
                   currentIndex: currentIndex,
-                  color: iconColor,
+                  color: gold,
                   onTap: onTap,
                 ),
               ],
@@ -103,8 +93,8 @@ class CiantisBottomNav extends StatelessWidget {
   }
 }
 
-class _NavItem extends StatelessWidget {
-  const _NavItem({
+class _NavIcon extends StatelessWidget {
+  const _NavIcon({
     required this.icon,
     required this.index,
     required this.currentIndex,
@@ -121,30 +111,36 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selected = index == currentIndex;
-    return IconButton(
-      tooltip: '',
-      splashRadius: 23,
-      onPressed: () => onTap(index),
-      icon: Icon(
-        icon,
-        size: 24,
-        color: color.withValues(alpha: selected ? 1 : 0.78),
+    return GestureDetector(
+      onTap: () => onTap(index),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        width: 48,
+        height: selected ? 54 : 47,
+        alignment: Alignment.center,
+        child: Icon(
+          icon,
+          size: selected ? 27 : 25,
+          color: color.withValues(alpha: selected ? 1 : 0.88),
+        ),
       ),
     );
   }
 }
 
-class _CenterGridButton extends StatelessWidget {
-  const _CenterGridButton({
+class _CenterButton extends StatelessWidget {
+  const _CenterButton({
+    required this.selected,
     required this.color,
     required this.surfaceColor,
-    required this.selected,
     required this.onTap,
   });
 
+  final bool selected;
   final Color color;
   final Color surfaceColor;
-  final bool selected;
   final VoidCallback onTap;
 
   @override
@@ -152,21 +148,23 @@ class _CenterGridButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: 50,
-        height: 50,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: selected ? 56 : 52,
+        height: selected ? 58 : 52,
+        margin: const EdgeInsets.only(bottom: 4),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: surfaceColor.withValues(alpha: 0.97),
+          color: const Color(0xFF2A251F).withValues(alpha: 0.98),
           boxShadow: [
             BoxShadow(
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-              color: Colors.black.withValues(alpha: selected ? 0.12 : 0.08),
+              color: Colors.black.withValues(alpha: 0.28),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
-        child: Icon(Icons.apps_rounded, size: 27, color: color),
+        child: Icon(Icons.apps_rounded, size: 29, color: color),
       ),
     );
   }

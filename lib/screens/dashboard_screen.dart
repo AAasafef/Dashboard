@@ -144,7 +144,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   const EdgeInsets.symmetric(horizontal: 12),
                               child: _agendaCard(),
                             ),
-                            const SizedBox(height: 105),
+                            const SizedBox(height: 118),
                           ],
                         ),
                       ),
@@ -164,6 +164,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ),
                       ),
+                      // NOTE: CiantisBottomNav is a universal, reusable
+                      // component. Any future light-surface screen (e.g.
+                      // Calendar, Notes, Settings) should pass
+                      // imageBackground: false and that screen's surface
+                      // color — the nav will automatically render as the
+                      // ivory "Option 1 — Minimal" pill with warm bronze
+                      // outline icons, matching the reference exactly.
                       if (_searchOpen) _searchOverlay(),
                       if (_activityOpen) _activitiesPanel(),
                       if (_notificationsOpen) _notificationsPanel(),

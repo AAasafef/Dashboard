@@ -43,20 +43,17 @@ class CiantisBottomNav extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        surfaceColor.withValues(alpha: 0.48),
+                        surfaceColor.withValues(alpha: 0.42),
                         surfaceColor.withValues(alpha: 0.86),
                       ],
                     )
                   : null,
               borderRadius: BorderRadius.circular(25),
-              border: Border.all(
-                color: iconColor.withValues(alpha: 0.10),
-              ),
               boxShadow: [
                 BoxShadow(
-                  blurRadius: 14,
+                  blurRadius: 12,
                   offset: const Offset(0, 5),
-                  color: Colors.black.withValues(alpha: 0.07),
+                  color: Colors.black.withValues(alpha: 0.045),
                 ),
               ],
             ),
@@ -161,12 +158,11 @@ class _CenterGridButton extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: surfaceColor.withValues(alpha: 0.97),
-          border: Border.all(color: color.withValues(alpha: 0.12)),
           boxShadow: [
             BoxShadow(
               blurRadius: 10,
               offset: const Offset(0, 4),
-              color: Colors.black.withValues(alpha: selected ? 0.13 : 0.09),
+              color: Colors.black.withValues(alpha: selected ? 0.12 : 0.08),
             ),
           ],
         ),

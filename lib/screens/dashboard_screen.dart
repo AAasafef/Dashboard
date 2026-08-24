@@ -1,7 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../widgets/ciantis_bottom_nav.dart';
-import 'activities_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -11,45 +9,19 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  static const _gold = Color(0xFFE3BF80);
-  static const _cream = Color(0xFFF2ECE5);
-  static const _ink = Color(0xFF1D1814);
+  static const _gold = Color(0xFFE0B96D);
+  static const _ivory = Color(0xFFF2ECE5);
+  static const _ink = Color(0xFF211C18);
 
-  int _currentIndex = 0;
   int _flowIndex = 0;
-  bool _navVisible = true;
-  bool _searchOpen = false;
-  bool _activityOpen = false;
-  bool _notificationsOpen = false;
-  double _lastOffset = 0;
-  final _searchController = TextEditingController();
+  int _navIndex = 0;
 
   static const _photo =
-      'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=90';
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  bool _handleScroll(ScrollNotification n) {
-    if (n is ScrollUpdateNotification) {
-      final y = n.metrics.pixels;
-      if (y > _lastOffset + 4 && _navVisible) {
-        setState(() => _navVisible = false);
-      } else if (y < _lastOffset - 4 && !_navVisible) {
-        setState(() => _navVisible = true);
-      }
-      if (y <= 2 && !_navVisible) setState(() => _navVisible = true);
-      _lastOffset = y;
-    }
-    return false;
-  }
+      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=95';
 
   String _dateText() {
     final n = DateTime.now();
-    const w = [
+    const weekdays = [
       'Monday',
       'Tuesday',
       'Wednesday',
@@ -58,7 +30,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       'Saturday',
       'Sunday',
     ];
-    const m = [
+    const months = [
       'January',
       'February',
       'March',
@@ -72,735 +44,541 @@ class _DashboardScreenState extends State<DashboardScreen> {
       'November',
       'December',
     ];
-    return '${w[n.weekday - 1]}, ${m[n.month - 1]} ${n.day}';
+    return '${weekdays[n.weekday - 1]}, ${months[n.month - 1]} ${n.day}';
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, c) {
-        final desktop = c.maxWidth > 700;
-        final phoneWidth = desktop ? 390.0 : c.maxWidth;
-        final phoneHeight =
-            desktop ? (c.maxHeight - 24).clamp(720.0, 844.0) : c.maxHeight;
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: LayoutBuilder(
+        builder: (context, c) {
+          final w = c.maxWidth;
+          final h = c.maxHeight;
+          final sx = w / 390.0;
+          final sy = h / 844.0;
 
-        return Scaffold(
-          backgroundColor: const Color(0xFFF4F0EB),
-          body: Center(
-            child: SizedBox(
-              width: phoneWidth,
-              height: phoneHeight,
-              child: ClipRect(
-                child: GestureDetector(
-                  onHorizontalDragEnd: (d) {
-                    if ((d.primaryVelocity ?? 0) < -250 &&
-                        !_searchOpen &&
-                        !_notificationsOpen) {
-                      setState(() => _activityOpen = true);
-                    }
-                  },
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.network(
-                        _photo,
-                        fit: BoxFit.cover,
-                        alignment: Alignment.center,
-                        errorBuilder: (_, __, ___) => const ColoredBox(
-                          color: Color(0xFF544A42),
-                        ),
-                      ),
-                      const DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0x55000000),
-                              Color(0x00000000),
-                              Color(0x22000000),
-                              Color(0xB8000000),
-                            ],
-                            stops: [0, .28, .62, 1],
-                          ),
-                        ),
-                      ),
-                      NotificationListener<ScrollNotification>(
-                        onNotification: _handleScroll,
-                        child: ListView(
-                          physics: const BouncingScrollPhysics(),
-                          padding: EdgeInsets.zero,
-                          children: [
-                            _topArea(),
-                            const SizedBox(height: 16),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: _flowCard(),
-                            ),
-                            const SizedBox(height: 12),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: _agendaCard(),
-                            ),
-                            const SizedBox(height: 118),
-                          ],
-                        ),
-                      ),
-                      Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        child: SafeArea(
-                          top: false,
-                          minimum: EdgeInsets.zero,
-                          child: CiantisBottomNav(
-                            currentIndex: _currentIndex,
-                            visible: _navVisible,
-                            surfaceColor: const Color(0xFF171512),
-                            imageBackground: true,
-                            onTap: (i) => setState(() => _currentIndex = i),
-                          ),
-                        ),
-                      ),
-                      // NOTE: CiantisBottomNav is a universal, reusable
-                      // component. Any future light-surface screen (e.g.
-                      // Calendar, Notes, Settings) should pass
-                      // imageBackground: false and that screen's surface
-                      // color — the nav will automatically render as the
-                      // ivory "Option 1 — Minimal" pill with warm bronze
-                      // outline icons, matching the reference exactly.
-                      if (_searchOpen) _searchOverlay(),
-                      if (_activityOpen) _activitiesPanel(),
-                      if (_notificationsOpen) _notificationsPanel(),
+          double x(double v) => v * sx;
+          double y(double v) => v * sy;
+          double f(double v) => v * sx;
+
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.network(
+                _photo,
+                fit: BoxFit.cover,
+                alignment: const Alignment(0.08, 0),
+                errorBuilder: (_, __, ___) => const ColoredBox(
+                  color: Color(0xFF3A2B22),
+                ),
+              ),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: [0, .28, .58, .82, 1],
+                    colors: [
+                      Color(0x66000000),
+                      Color(0x11000000),
+                      Color(0x08000000),
+                      Color(0x33000000),
+                      Color(0xB0000000),
                     ],
                   ),
                 ),
               ),
-            ),
-          ),
-        );
-      },
-    );
-  }
 
-  Widget _topArea() {
-    return SafeArea(
-      bottom: false,
-      child: SizedBox(
-        height: 425,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _glassIcon(
-                    Icons.search_rounded,
-                    () => setState(() => _searchOpen = true),
+              // Greeting — sized and positioned to match the reference.
+              Positioned(
+                left: x(27),
+                top: y(92),
+                width: x(300),
+                child: const Text(
+                  'Good morning,\nShaverian',
+                  style: TextStyle(
+                    fontFamily: 'serif',
+                    fontSize: 32,
+                    height: .98,
+                    fontWeight: FontWeight.w300,
+                    letterSpacing: -.6,
+                    color: Color(0xFFF4EFE8),
                   ),
-                  _glassIcon(
-                    Icons.notifications_none_rounded,
-                    () => setState(() => _notificationsOpen = true),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 74),
-              const Text(
-                'Good morning,\nShaverian',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 38,
-                  height: 1.12,
-                  fontWeight: FontWeight.w300,
-                  fontFamily: 'serif',
-                  letterSpacing: -0.7,
                 ),
               ),
-              const SizedBox(height: 18),
-              Text(
-                _dateText(),
-                style: const TextStyle(
-                  color: Color(0xFFF3EAE0),
-                  fontSize: 16,
-                  fontFamily: 'serif',
-                ),
-              ),
-              const SizedBox(height: 27),
-              Container(width: 44, height: 1.5, color: _gold),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _glassIcon(IconData icon, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Container(
-            width: 38,
-            height: 38,
-            alignment: Alignment.center,
-            color: Colors.black.withValues(alpha: .12),
-            child: Icon(
-              icon,
-              color: const Color(0xFFF6EBDD),
-              size: 21,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _flowCard() {
-    const items = [
-      (Icons.wb_sunny_outlined, 'Morning'),
-      (Icons.light_mode_outlined, 'Afternoon'),
-      (Icons.wb_twilight_outlined, 'Evening'),
-      (Icons.dark_mode_outlined, 'Night'),
-    ];
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Container(
-          height: 172,
-          padding: const EdgeInsets.fromLTRB(20, 19, 16, 10),
-          color: const Color(0xFF17130F).withValues(alpha: .88),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "TODAY'S FLOW",
-                style: TextStyle(
-                  color: Color(0xFFEBD8BA),
-                  fontSize: 11,
-                  letterSpacing: 1.6,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: Row(
-                  children: List.generate(items.length, (i) {
-                    final active = _flowIndex == i;
-                    return Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _flowIndex = i),
-                        behavior: HitTestBehavior.opaque,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          curve: Curves.easeOutCubic,
-                          transform: Matrix4.translationValues(
-                            0,
-                            active ? 7 : 0,
-                            0,
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(
-                                items[i].$1,
-                                color: active
-                                    ? _gold
-                                    : const Color(0xFFC9BFB4),
-                                size: active ? 31 : 27,
-                              ),
-                              SizedBox(height: active ? 10 : 8),
-                              Text(
-                                items[i].$2,
-                                style: TextStyle(
-                                  color: active
-                                      ? _gold
-                                      : const Color(0xFFC9BFB4),
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const Spacer(),
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 180),
-                                height: active ? 2 : 0,
-                                width: active ? 42 : 0,
-                                color: _gold,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _agendaCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: _cream.withValues(alpha: .97),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
-      child: const Column(
-        children: [
-          _AgendaRow(
-            'NEXT APPOINTMENT',
-            '10:00 AM   |   Strategy Call',
-            Icons.calendar_today_outlined,
-          ),
-          _ThinDivider(),
-          _AgendaRow(
-            'SCHOOL ASSIGNMENT',
-            'Brand Positioning Draft',
-            Icons.menu_book_outlined,
-            trailing: 'Due Aug 24',
-          ),
-          _ThinDivider(),
-          _SpacesRow(),
-        ],
-      ),
-    );
-  }
-
-  Widget _searchOverlay() {
-    final q = _searchController.text.trim().toLowerCase();
-    final all = [
-      'Strategy Call',
-      'Science Quiz',
-      'Brand Positioning Draft',
-      'CIANTIS Hub',
-      'Science Notes',
-      'Science Project',
-    ];
-    final shown = q.isEmpty
-        ? all.take(4).toList()
-        : all.where((e) => e.toLowerCase().contains(q)).toList();
-
-    return Positioned.fill(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          color: Colors.black.withValues(alpha: .42),
-          padding: const EdgeInsets.fromLTRB(18, 54, 18, 90),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      autofocus: true,
-                      controller: _searchController,
-                      onChanged: (_) => setState(() {}),
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: 'Search CIANTIS...',
-                        hintStyle:
-                            const TextStyle(color: Colors.white60),
-                        prefixIcon: const Icon(
-                          Icons.search,
-                          color: Colors.white70,
-                        ),
-                        suffixIcon: q.isNotEmpty
-                            ? IconButton(
-                                onPressed: () {
-                                  _searchController.clear();
-                                  setState(() {});
-                                },
-                                icon: const Icon(
-                                  Icons.close,
-                                  color: Colors.white70,
-                                ),
-                              )
-                            : null,
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: .12),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(22),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  TextButton(
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() => _searchOpen = false);
-                    },
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 22),
-              Align(
-                alignment: Alignment.centerLeft,
+              Positioned(
+                left: x(27),
+                top: y(166),
                 child: Text(
-                  q.isEmpty ? 'RECENT' : 'TOP RESULTS',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                  _dateText(),
+                  style: TextStyle(
+                    fontFamily: 'serif',
+                    fontSize: f(15.5),
+                    height: 1,
+                    fontWeight: FontWeight.w300,
+                    color: const Color(0xFFEDE3D7),
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
-              ...shown.map(
-                (e) => Container(
-                  margin: const EdgeInsets.only(bottom: 1),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: .22),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.description_outlined,
-                        color: _gold,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          e,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      const Icon(
-                        Icons.chevron_right,
-                        color: Colors.white60,
-                      ),
-                    ],
+              Positioned(
+                left: x(27),
+                top: y(197),
+                child: Container(
+                  width: x(29),
+                  height: 1.4,
+                  color: _gold,
+                ),
+              ),
+
+              // TODAY'S FLOW.
+              Positioned(
+                left: x(16),
+                right: x(16),
+                top: y(279),
+                height: y(121),
+                child: ClipPath(
+                  clipper: _FlowClipper(),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                    child: Container(
+                      color: const Color(0xFF15120F).withValues(alpha: .94),
+                    ),
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _activitiesPanel() {
-    return Positioned.fill(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: SizedBox(
-            width: MediaQuery.sizeOf(context).width * .88,
-            height: double.infinity,
-            child: ActivitiesScreen(
-              onClose: () => setState(() => _activityOpen = false),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _notificationsPanel() => _sidePanel(
-        title: 'Notifications',
-        onClose: () => setState(() => _notificationsOpen = false),
-        child: const Column(
-          children: [
-            _Notice('CIANTIS Hub', '2 new updates', '2m ago'),
-            _Notice('Strategy Call', 'Meeting starts in 15 min', '15m ago'),
-            _Notice('Science Quiz', 'Due tomorrow', '1h ago'),
-            _Notice(
-              'Study Session',
-              "Don't forget your study session",
-              '2h ago',
-            ),
-          ],
-        ),
-      );
-
-  Widget _sidePanel({
-    required String title,
-    required VoidCallback onClose,
-    required Widget child,
-  }) {
-    return Positioned.fill(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: Container(
-            width: MediaQuery.sizeOf(context).width * .88,
-            height: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 54, 20, 24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFF2C2B2D).withValues(alpha: .96),
-                  const Color(0xFF151515).withValues(alpha: .98),
-                ],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: .35),
-                  blurRadius: 30,
+              Positioned(
+                left: x(30),
+                top: y(294),
+                child: Text(
+                  "TODAY'S FLOW",
+                  style: TextStyle(
+                    color: const Color(0xFFE8D7BB),
+                    fontSize: f(8.2),
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 1.5,
+                  ),
                 ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Row(
+              ),
+              Positioned(
+                left: x(20),
+                right: x(20),
+                top: y(322),
+                height: y(68),
+                child: Row(
                   children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
+                    _flowItem(Icons.wb_sunny_outlined, 'Morning', 0, f),
+                    _flowItem(Icons.light_mode_outlined, 'Afternoon', 1, f),
+                    _flowItem(Icons.wb_twilight_outlined, 'Evening', 2, f),
+                    _flowItem(Icons.dark_mode_outlined, 'Night', 3, f),
+                  ],
+                ),
+              ),
+              Positioned(
+                left: x(33),
+                top: y(394),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 160),
+                  width: x(31),
+                  height: 1.4,
+                  color: _flowIndex == 0 ? _gold : Colors.transparent,
+                ),
+              ),
+
+              // Main ivory agenda card.
+              Positioned(
+                left: x(16),
+                right: x(16),
+                top: y(408),
+                height: y(246),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(x(6)),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _ivory.withValues(alpha: .975),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: .25),
+                          width: .5,
                         ),
                       ),
                     ),
-                    IconButton(
-                      onPressed: onClose,
-                      icon: const Icon(
-                        Icons.close,
-                        color: Colors.white70,
-                      ),
+                  ),
+                ),
+              ),
+
+              _label('NEXT APPOINTMENT', x(30), y(429), f),
+              Positioned(
+                left: x(30),
+                top: y(449),
+                child: Row(
+                  children: [
+                    Text(
+                      '10:00 AM',
+                      style: _serif(f(15.5), FontWeight.w400),
+                    ),
+                    SizedBox(width: x(12)),
+                    Container(
+                      width: .7,
+                      height: y(14),
+                      color: const Color(0xFFBEB4AA),
+                    ),
+                    SizedBox(width: x(12)),
+                    Text(
+                      'Strategy Call',
+                      style: _serif(f(15.5), FontWeight.w400),
                     ),
                   ],
                 ),
-                const SizedBox(height: 18),
-                Expanded(
-                  child: SingleChildScrollView(child: child),
+              ),
+              Positioned(
+                right: x(30),
+                top: y(438),
+                child: Icon(
+                  Icons.calendar_today_outlined,
+                  size: x(18.5),
+                  color: _ink,
                 ),
-              ],
+              ),
+              _divider(x, y(486)),
+
+              _label('SCHOOL ASSIGNMENT', x(30), y(503), f),
+              Positioned(
+                left: x(30),
+                top: y(524),
+                child: Text(
+                  'Brand Positioning Draft',
+                  style: _serif(f(14.5), FontWeight.w400),
+                ),
+              ),
+              Positioned(
+                right: x(61),
+                top: y(525),
+                child: Text(
+                  'Due Aug 24',
+                  style: TextStyle(
+                    fontFamily: 'serif',
+                    fontSize: f(10.8),
+                    color: const Color(0xFF75675A),
+                  ),
+                ),
+              ),
+              Positioned(
+                right: x(30),
+                top: y(516),
+                child: Icon(
+                  Icons.menu_book_outlined,
+                  size: x(20),
+                  color: _ink,
+                ),
+              ),
+              _divider(x, y(558)),
+
+              _label('SPACES', x(30), y(578), f),
+              Positioned(
+                left: x(30),
+                top: y(598),
+                child: Text(
+                  '3 updates',
+                  style: _serif(f(15.2), FontWeight.w400),
+                ),
+              ),
+              Positioned(
+                right: x(69),
+                top: y(584),
+                child: SizedBox(
+                  width: x(76),
+                  height: x(29),
+                  child: Stack(
+                    children: [
+                      _avatar(x, 0, const Color(0xFF855D46)),
+                      _avatar(x, 19, const Color(0xFF6F4938)),
+                      _avatar(x, 38, const Color(0xFF4C352B)),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                right: x(32),
+                top: y(588),
+                child: Icon(
+                  Icons.chevron_right,
+                  size: x(21),
+                  color: _ink,
+                ),
+              ),
+
+              // Bottom navigation: flush, low-profile, dark glass.
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: y(79),
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                    child: Container(
+                      color: const Color(0xFF0B0B0A).withValues(alpha: .90),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: y(9),
+                height: y(55),
+                child: Row(
+                  children: [
+                    _nav(Icons.crop_square_rounded, 0, x),
+                    _nav(Icons.calendar_month_outlined, 1, x),
+                    const Expanded(child: SizedBox()),
+                    _nav(Icons.article_outlined, 3, x),
+                    _nav(Icons.settings_outlined, 4, x),
+                  ],
+                ),
+              ),
+              Positioned(
+                left: (w / 2) - x(23.5),
+                bottom: y(14),
+                child: GestureDetector(
+                  onTap: () => setState(() => _navIndex = 2),
+                  child: Container(
+                    width: x(47),
+                    height: x(47),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF171615),
+                      border: Border.all(
+                        color: _gold.withValues(alpha: .30),
+                        width: .75,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: .42),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: _DotGrid(
+                      color: _gold.withValues(
+                        alpha: _navIndex == 2 ? 1 : .84,
+                      ),
+                      dot: x(3.2),
+                      gap: x(3.4),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _flowItem(
+    IconData icon,
+    String label,
+    int index,
+    double Function(double) f,
+  ) {
+    final active = _flowIndex == index;
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => setState(() => _flowIndex = index),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(
+              icon,
+              size: f(active ? 26 : 24.5),
+              color: active ? _gold : const Color(0xFFD0C4B8),
             ),
-          ),
+            const SizedBox(height: 7),
+            Text(
+              label,
+              maxLines: 1,
+              style: TextStyle(
+                fontFamily: 'serif',
+                fontSize: f(active ? 10.8 : 9.8),
+                height: 1,
+                fontWeight: FontWeight.w300,
+                color: active ? _gold : const Color(0xFFD5C9BE),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
-}
 
-class _AgendaRow extends StatelessWidget {
-  const _AgendaRow(this.eyebrow, this.title, this.icon, {this.trailing});
+  TextStyle _serif(double size, FontWeight weight) => TextStyle(
+        fontFamily: 'serif',
+        fontSize: size,
+        height: 1,
+        fontWeight: weight,
+        color: _ink,
+      );
 
-  final String eyebrow;
-  final String title;
-  final IconData icon;
-  final String? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                eyebrow,
-                style: const TextStyle(
-                  fontSize: 10,
-                  letterSpacing: 1.5,
-                  color: Color(0xFF6F665D),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontFamily: 'serif',
-                        fontSize: 17,
-                        color: _DashboardScreenState._ink,
-                      ),
-                    ),
-                  ),
-                  if (trailing != null)
-                    Text(
-                      trailing!,
-                      style: const TextStyle(
-                        fontFamily: 'serif',
-                        fontSize: 12,
-                        color: Color(0xFF6F665D),
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 14),
-        Icon(icon, size: 28, color: _DashboardScreenState._ink),
-      ],
-    );
-  }
-}
-
-class _ThinDivider extends StatelessWidget {
-  const _ThinDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 20),
-      child: Divider(height: 1, color: Color(0xFFD9D1C8)),
-    );
-  }
-}
-
-class _SpacesRow extends StatelessWidget {
-  const _SpacesRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'SPACES',
-                style: TextStyle(
-                  fontSize: 10,
-                  letterSpacing: 1.5,
-                  color: Color(0xFF6F665D),
-                ),
-              ),
-              SizedBox(height: 9),
-              Text(
-                '3 updates',
-                style: TextStyle(
-                  fontFamily: 'serif',
-                  fontSize: 17,
-                  color: _DashboardScreenState._ink,
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          width: 84,
-          height: 34,
-          child: Stack(
-            children: const [
-              _Avatar(0, Color(0xFF8E684C)),
-              _Avatar(23, Color(0xFF6E4E39)),
-              _Avatar(46, Color(0xFF4D382C)),
-            ],
-          ),
-        ),
-        const Icon(Icons.chevron_right_rounded, size: 29),
-      ],
-    );
-  }
-}
-
-class _Avatar extends StatelessWidget {
-  const _Avatar(this.left, this.color);
-
-  final double left;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _label(
+    String text,
+    double left,
+    double top,
+    double Function(double) f,
+  ) {
     return Positioned(
       left: left,
+      top: top,
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: f(7.6),
+          height: 1,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 1.15,
+          color: const Color(0xFF685F57),
+        ),
+      ),
+    );
+  }
+
+  Widget _divider(double Function(double) x, double top) {
+    return Positioned(
+      left: x(30),
+      right: x(30),
+      top: top,
       child: Container(
-        width: 34,
-        height: 34,
+        height: .55,
+        color: const Color(0xFFD2CAC1),
+      ),
+    );
+  }
+
+  Widget _avatar(
+    double Function(double) x,
+    double left,
+    Color tone,
+  ) {
+    return Positioned(
+      left: x(left),
+      child: Container(
+        width: x(27),
+        height: x(27),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: color,
-          border: Border.all(
-            color: _DashboardScreenState._cream,
-            width: 1.4,
-          ),
+          color: tone,
+          border: Border.all(color: _ivory, width: 1.2),
         ),
-        child: const Icon(
-          Icons.person_rounded,
-          size: 19,
-          color: Color(0xFFEBD9C8),
+        child: Icon(
+          Icons.person,
+          size: x(17),
+          color: const Color(0xFFF4E9DD),
+        ),
+      ),
+    );
+  }
+
+  Widget _nav(
+    IconData icon,
+    int index,
+    double Function(double) x,
+  ) {
+    final active = _navIndex == index;
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => setState(() => _navIndex = index),
+        child: Center(
+          child: Icon(
+            icon,
+            size: x(active ? 20.5 : 19),
+            color: _gold.withValues(alpha: active ? 1 : .72),
+          ),
         ),
       ),
     );
   }
 }
 
-class _Notice extends StatelessWidget {
-  const _Notice(this.title, this.subtitle, this.time);
+class _FlowClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size s) {
+    final p = Path();
+    final r = s.height * .10;
 
-  final String title;
-  final String subtitle;
-  final String time;
+    p.moveTo(r, 0);
+    p.lineTo(s.width * .23, 0);
+    p.cubicTo(
+      s.width * .27,
+      0,
+      s.width * .29,
+      s.height * .18,
+      s.width * .37,
+      s.height * .23,
+    );
+    p.cubicTo(
+      s.width * .42,
+      s.height * .26,
+      s.width * .49,
+      s.height * .27,
+      s.width * .56,
+      s.height * .27,
+    );
+    p.lineTo(s.width - r, s.height * .27);
+    p.quadraticBezierTo(s.width, s.height * .27, s.width, s.height * .27 + r);
+    p.lineTo(s.width, s.height - r);
+    p.quadraticBezierTo(s.width, s.height, s.width - r, s.height);
+    p.lineTo(r, s.height);
+    p.quadraticBezierTo(0, s.height, 0, s.height - r);
+    p.lineTo(0, r);
+    p.quadraticBezierTo(0, 0, r, 0);
+    p.close();
+    return p;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class _DotGrid extends StatelessWidget {
+  const _DotGrid({
+    required this.color,
+    required this.dot,
+    required this.gap,
+  });
+
+  final Color color;
+  final double dot;
+  final double gap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Color(0x22FFFFFF)),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        3,
+        (_) => Padding(
+          padding: EdgeInsets.symmetric(vertical: gap / 2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(
+              3,
+              (_) => Padding(
+                padding: EdgeInsets.symmetric(horizontal: gap / 2),
+                child: Container(
+                  width: dot,
+                  height: dot,
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+                ),
+              ),
+            ),
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.notifications_none_rounded,
-            color: _DashboardScreenState._gold,
-            size: 19,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: Colors.white60,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            time,
-            style: const TextStyle(
-              color: Colors.white45,
-              fontSize: 11,
-            ),
-          ),
-        ],
       ),
     );
   }

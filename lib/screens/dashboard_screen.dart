@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../widgets/ciantis_bottom_nav.dart';
+import 'activities_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -48,8 +49,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   String _dateText() {
     final n = DateTime.now();
-    const w = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-    const m = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const w = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    const m = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
     return '${w[n.weekday - 1]}, ${m[n.month - 1]} ${n.day}';
   }
 
@@ -59,7 +81,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context, c) {
         final desktop = c.maxWidth > 700;
         final phoneWidth = desktop ? 390.0 : c.maxWidth;
-        final phoneHeight = desktop ? (c.maxHeight - 24).clamp(720.0, 844.0) : c.maxHeight;
+        final phoneHeight =
+            desktop ? (c.maxHeight - 24).clamp(720.0, 844.0) : c.maxHeight;
 
         return Scaffold(
           backgroundColor: const Color(0xFFF4F0EB),
@@ -70,7 +93,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: ClipRect(
                 child: GestureDetector(
                   onHorizontalDragEnd: (d) {
-                    if ((d.primaryVelocity ?? 0) < -250) {
+                    if ((d.primaryVelocity ?? 0) < -250 &&
+                        !_searchOpen &&
+                        !_notificationsOpen) {
                       setState(() => _activityOpen = true);
                     }
                   },
@@ -81,7 +106,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         _photo,
                         fit: BoxFit.cover,
                         alignment: Alignment.center,
-                        errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF544A42)),
+                        errorBuilder: (_, __, ___) => const ColoredBox(
+                          color: Color(0xFF544A42),
+                        ),
                       ),
                       const DecoratedBox(
                         decoration: BoxDecoration(
@@ -107,12 +134,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             _topArea(),
                             const SizedBox(height: 16),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                               child: _flowCard(),
                             ),
                             const SizedBox(height: 12),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
                               child: _agendaCard(),
                             ),
                             const SizedBox(height: 105),
@@ -162,8 +191,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _glassIcon(Icons.search_rounded, () => setState(() => _searchOpen = true)),
-                  _glassIcon(Icons.notifications_none_rounded, () => setState(() => _notificationsOpen = true)),
+                  _glassIcon(
+                    Icons.search_rounded,
+                    () => setState(() => _searchOpen = true),
+                  ),
+                  _glassIcon(
+                    Icons.notifications_none_rounded,
+                    () => setState(() => _notificationsOpen = true),
+                  ),
                 ],
               ),
               const SizedBox(height: 74),
@@ -208,7 +243,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             height: 38,
             alignment: Alignment.center,
             color: Colors.black.withValues(alpha: .12),
-            child: Icon(icon, color: const Color(0xFFF6EBDD), size: 21),
+            child: Icon(
+              icon,
+              color: const Color(0xFFF6EBDD),
+              size: 21,
+            ),
           ),
         ),
       ),
@@ -234,7 +273,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("TODAY'S FLOW", style: TextStyle(color: Color(0xFFEBD8BA), fontSize: 11, letterSpacing: 1.6)),
+              const Text(
+                "TODAY'S FLOW",
+                style: TextStyle(
+                  color: Color(0xFFEBD8BA),
+                  fontSize: 11,
+                  letterSpacing: 1.6,
+                ),
+              ),
               const SizedBox(height: 16),
               Expanded(
                 child: Row(
@@ -243,14 +289,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     return Expanded(
                       child: GestureDetector(
                         onTap: () => setState(() => _flowIndex = i),
+                        behavior: HitTestBehavior.opaque,
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 180),
-                          padding: EdgeInsets.only(top: active ? 0 : 9),
+                          curve: Curves.easeOutCubic,
+                          transform: Matrix4.translationValues(
+                            0,
+                            active ? 7 : 0,
+                            0,
+                          ),
                           child: Column(
                             children: [
-                              Icon(items[i].$1, color: active ? _gold : const Color(0xFFC9BFB4), size: active ? 31 : 27),
+                              Icon(
+                                items[i].$1,
+                                color: active
+                                    ? _gold
+                                    : const Color(0xFFC9BFB4),
+                                size: active ? 31 : 27,
+                              ),
                               SizedBox(height: active ? 10 : 8),
-                              Text(items[i].$2, style: TextStyle(color: active ? _gold : const Color(0xFFC9BFB4), fontSize: 12)),
+                              Text(
+                                items[i].$2,
+                                style: TextStyle(
+                                  color: active
+                                      ? _gold
+                                      : const Color(0xFFC9BFB4),
+                                  fontSize: 12,
+                                ),
+                              ),
                               const Spacer(),
                               AnimatedContainer(
                                 duration: const Duration(milliseconds: 180),
@@ -282,9 +348,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
       child: const Column(
         children: [
-          _AgendaRow('NEXT APPOINTMENT', '10:00 AM   |   Strategy Call', Icons.calendar_today_outlined),
+          _AgendaRow(
+            'NEXT APPOINTMENT',
+            '10:00 AM   |   Strategy Call',
+            Icons.calendar_today_outlined,
+          ),
           _ThinDivider(),
-          _AgendaRow('SCHOOL ASSIGNMENT', 'Brand Positioning Draft', Icons.menu_book_outlined, trailing: 'Due Aug 24'),
+          _AgendaRow(
+            'SCHOOL ASSIGNMENT',
+            'Brand Positioning Draft',
+            Icons.menu_book_outlined,
+            trailing: 'Due Aug 24',
+          ),
           _ThinDivider(),
           _SpacesRow(),
         ],
@@ -294,8 +369,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _searchOverlay() {
     final q = _searchController.text.trim().toLowerCase();
-    final all = ['Strategy Call','Science Quiz','Brand Positioning Draft','CIANTIS Hub','Science Notes','Science Project'];
-    final shown = q.isEmpty ? all.take(4).toList() : all.where((e) => e.toLowerCase().contains(q)).toList();
+    final all = [
+      'Strategy Call',
+      'Science Quiz',
+      'Brand Positioning Draft',
+      'CIANTIS Hub',
+      'Science Notes',
+      'Science Project',
+    ];
+    final shown = q.isEmpty
+        ? all.take(4).toList()
+        : all.where((e) => e.toLowerCase().contains(q)).toList();
 
     return Positioned.fill(
       child: BackdropFilter(
@@ -315,28 +399,89 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'Search CIANTIS...',
-                        hintStyle: const TextStyle(color: Colors.white60),
-                        prefixIcon: const Icon(Icons.search, color: Colors.white70),
-                        suffixIcon: q.isNotEmpty ? IconButton(onPressed: () { _searchController.clear(); setState(() {}); }, icon: const Icon(Icons.close, color: Colors.white70)) : null,
+                        hintStyle:
+                            const TextStyle(color: Colors.white60),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.white70,
+                        ),
+                        suffixIcon: q.isNotEmpty
+                            ? IconButton(
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {});
+                                },
+                                icon: const Icon(
+                                  Icons.close,
+                                  color: Colors.white70,
+                                ),
+                              )
+                            : null,
                         filled: true,
                         fillColor: Colors.white.withValues(alpha: .12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(22), borderSide: BorderSide.none),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(22),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 10),
-                  TextButton(onPressed: () { _searchController.clear(); setState(() => _searchOpen = false); }, child: const Text('Cancel', style: TextStyle(color: Colors.white))),
+                  TextButton(
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() => _searchOpen = false);
+                    },
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 22),
-              Align(alignment: Alignment.centerLeft, child: Text(q.isEmpty ? 'RECENT' : 'TOP RESULTS', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600))),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  q.isEmpty ? 'RECENT' : 'TOP RESULTS',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
               const SizedBox(height: 10),
-              ...shown.map((e) => Container(
-                margin: const EdgeInsets.only(bottom: 1),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                decoration: BoxDecoration(color: Colors.black.withValues(alpha: .22), borderRadius: BorderRadius.circular(8)),
-                child: Row(children: [const Icon(Icons.description_outlined, color: _gold), const SizedBox(width: 12), Expanded(child: Text(e, style: const TextStyle(color: Colors.white))), const Icon(Icons.chevron_right, color: Colors.white60)]),
-              )),
+              ...shown.map(
+                (e) => Container(
+                  margin: const EdgeInsets.only(bottom: 1),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: .22),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.description_outlined,
+                        color: _gold,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          e,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      const Icon(
+                        Icons.chevron_right,
+                        color: Colors.white60,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -344,33 +489,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _activitiesPanel() => _sidePanel(
-    title: 'Activities',
-    onClose: () => setState(() => _activityOpen = false),
-    child: const Column(
-      children: [
-        _TimelineItem('10:00 AM', 'Strategy Call', 'Calendar'),
-        _TimelineItem('1:30 PM', 'Study Session', 'Task'),
-        _TimelineItem('3:00 PM', 'Science Quiz', 'Academic'),
-        _TimelineItem('5:00 PM', 'Gym', 'Personal'),
-      ],
-    ),
-  );
+  Widget _activitiesPanel() {
+    return Positioned.fill(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: SizedBox(
+            width: MediaQuery.sizeOf(context).width * .88,
+            height: double.infinity,
+            child: ActivitiesScreen(
+              onClose: () => setState(() => _activityOpen = false),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _notificationsPanel() => _sidePanel(
-    title: 'Notifications',
-    onClose: () => setState(() => _notificationsOpen = false),
-    child: const Column(
-      children: [
-        _Notice('CIANTIS Hub', '2 new updates', '2m ago'),
-        _Notice('Strategy Call', 'Meeting starts in 15 min', '15m ago'),
-        _Notice('Science Quiz', 'Due tomorrow', '1h ago'),
-        _Notice('Study Session', "Don't forget your study session", '2h ago'),
-      ],
-    ),
-  );
+        title: 'Notifications',
+        onClose: () => setState(() => _notificationsOpen = false),
+        child: const Column(
+          children: [
+            _Notice('CIANTIS Hub', '2 new updates', '2m ago'),
+            _Notice('Strategy Call', 'Meeting starts in 15 min', '15m ago'),
+            _Notice('Science Quiz', 'Due tomorrow', '1h ago'),
+            _Notice(
+              'Study Session',
+              "Don't forget your study session",
+              '2h ago',
+            ),
+          ],
+        ),
+      );
 
-  Widget _sidePanel({required String title, required VoidCallback onClose, required Widget child}) {
+  Widget _sidePanel({
+    required String title,
+    required VoidCallback onClose,
+    required Widget child,
+  }) {
     return Positioned.fill(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
@@ -384,15 +542,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [const Color(0xFF2C2B2D).withValues(alpha: .96), const Color(0xFF151515).withValues(alpha: .98)],
+                colors: [
+                  const Color(0xFF2C2B2D).withValues(alpha: .96),
+                  const Color(0xFF151515).withValues(alpha: .98),
+                ],
               ),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .35), blurRadius: 30)],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: .35),
+                  blurRadius: 30,
+                ),
+              ],
             ),
             child: Column(
               children: [
-                Row(children: [Expanded(child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w500))), IconButton(onPressed: onClose, icon: const Icon(Icons.close, color: Colors.white70))]),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: onClose,
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 18),
-                Expanded(child: SingleChildScrollView(child: child)),
+                Expanded(
+                  child: SingleChildScrollView(child: child),
+                ),
               ],
             ),
           ),
@@ -404,6 +592,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 class _AgendaRow extends StatelessWidget {
   const _AgendaRow(this.eyebrow, this.title, this.icon, {this.trailing});
+
   final String eyebrow;
   final String title;
   final IconData icon;
@@ -414,11 +603,43 @@ class _AgendaRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(eyebrow, style: const TextStyle(fontSize: 10, letterSpacing: 1.5, color: Color(0xFF6F665D))),
-            const SizedBox(height: 10),
-            Row(children: [Expanded(child: Text(title, style: const TextStyle(fontFamily: 'serif', fontSize: 17, color: _DashboardScreenState._ink))), if (trailing != null) Text(trailing!, style: const TextStyle(fontFamily: 'serif', fontSize: 12, color: Color(0xFF6F665D)))])
-          ]),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                eyebrow,
+                style: const TextStyle(
+                  fontSize: 10,
+                  letterSpacing: 1.5,
+                  color: Color(0xFF6F665D),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontFamily: 'serif',
+                        fontSize: 17,
+                        color: _DashboardScreenState._ink,
+                      ),
+                    ),
+                  ),
+                  if (trailing != null)
+                    Text(
+                      trailing!,
+                      style: const TextStyle(
+                        fontFamily: 'serif',
+                        fontSize: 12,
+                        color: Color(0xFF6F665D),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
         const SizedBox(width: 14),
         Icon(icon, size: 28, color: _DashboardScreenState._ink),
@@ -429,40 +650,151 @@ class _AgendaRow extends StatelessWidget {
 
 class _ThinDivider extends StatelessWidget {
   const _ThinDivider();
+
   @override
-  Widget build(BuildContext context) => const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Divider(height: 1, color: Color(0xFFD9D1C8)));
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 20),
+      child: Divider(height: 1, color: Color(0xFFD9D1C8)),
+    );
+  }
 }
 
 class _SpacesRow extends StatelessWidget {
   const _SpacesRow();
+
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('SPACES', style: TextStyle(fontSize: 10, letterSpacing: 1.5, color: Color(0xFF6F665D))), SizedBox(height: 9), Text('3 updates', style: TextStyle(fontFamily: 'serif', fontSize: 17, color: _DashboardScreenState._ink))])),
-      SizedBox(width: 84, height: 34, child: Stack(children: const [_Avatar(0, Color(0xFF8E684C)), _Avatar(23, Color(0xFF6E4E39)), _Avatar(46, Color(0xFF4D382C))])),
-      const Icon(Icons.chevron_right_rounded, size: 29),
-    ]);
+    return Row(
+      children: [
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'SPACES',
+                style: TextStyle(
+                  fontSize: 10,
+                  letterSpacing: 1.5,
+                  color: Color(0xFF6F665D),
+                ),
+              ),
+              SizedBox(height: 9),
+              Text(
+                '3 updates',
+                style: TextStyle(
+                  fontFamily: 'serif',
+                  fontSize: 17,
+                  color: _DashboardScreenState._ink,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: 84,
+          height: 34,
+          child: Stack(
+            children: const [
+              _Avatar(0, Color(0xFF8E684C)),
+              _Avatar(23, Color(0xFF6E4E39)),
+              _Avatar(46, Color(0xFF4D382C)),
+            ],
+          ),
+        ),
+        const Icon(Icons.chevron_right_rounded, size: 29),
+      ],
+    );
   }
 }
 
 class _Avatar extends StatelessWidget {
   const _Avatar(this.left, this.color);
+
   final double left;
   final Color color;
-  @override
-  Widget build(BuildContext context) => Positioned(left: left, child: Container(width: 34, height: 34, decoration: BoxDecoration(shape: BoxShape.circle, color: color, border: Border.all(color: _DashboardScreenState._cream, width: 1.4)), child: const Icon(Icons.person_rounded, size: 19, color: Color(0xFFEBD9C8))));
-}
 
-class _TimelineItem extends StatelessWidget {
-  const _TimelineItem(this.time, this.title, this.tag);
-  final String time, title, tag;
   @override
-  Widget build(BuildContext context) => Padding(padding: const EdgeInsets.only(bottom: 22), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(width: 9, height: 9, margin: const EdgeInsets.only(top: 5), decoration: const BoxDecoration(shape: BoxShape.circle, color: _DashboardScreenState._gold)), const SizedBox(width: 12), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(time, style: const TextStyle(color: Colors.white54, fontSize: 11)), const SizedBox(height: 3), Text(title, style: const TextStyle(color: Colors.white, fontSize: 15)), const SizedBox(height: 5), Text(tag, style: const TextStyle(color: _DashboardScreenState._gold, fontSize: 11))]))]));
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: left,
+      child: Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color,
+          border: Border.all(
+            color: _DashboardScreenState._cream,
+            width: 1.4,
+          ),
+        ),
+        child: const Icon(
+          Icons.person_rounded,
+          size: 19,
+          color: Color(0xFFEBD9C8),
+        ),
+      ),
+    );
+  }
 }
 
 class _Notice extends StatelessWidget {
   const _Notice(this.title, this.subtitle, this.time);
-  final String title, subtitle, time;
+
+  final String title;
+  final String subtitle;
+  final String time;
+
   @override
-  Widget build(BuildContext context) => Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.symmetric(vertical: 14), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0x22FFFFFF)))), child: Row(children: [const Icon(Icons.notifications_none_rounded, color: _DashboardScreenState._gold, size: 19), const SizedBox(width: 12), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(color: Colors.white, fontSize: 15)), const SizedBox(height: 4), Text(subtitle, style: const TextStyle(color: Colors.white60, fontSize: 12))])), Text(time, style: const TextStyle(color: Colors.white45, fontSize: 11))]));
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Color(0x22FFFFFF)),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.notifications_none_rounded,
+            color: _DashboardScreenState._gold,
+            size: 19,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Colors.white60,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            time,
+            style: const TextStyle(
+              color: Colors.white45,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

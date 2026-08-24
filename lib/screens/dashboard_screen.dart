@@ -9,10 +9,10 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  static const _pageColor = Color(0xFFF5F1EB);
-  static const _ink = Color(0xFF2A241D);
-  static const _muted = Color(0xFF81776A);
-  static const _gold = Color(0xFFD7B477);
+  static const _ink = Color(0xFF18130F);
+  static const _muted = Color(0xFF6F665D);
+  static const _gold = Color(0xFFE0B971);
+  static const _navSurface = Color(0xFF151310);
 
   int _currentIndex = 0;
   bool _navVisible = true;
@@ -36,115 +36,105 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _dateText() {
     final now = DateTime.now();
     const weekdays = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
+      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
     ];
     const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
     return '${weekdays[now.weekday - 1]}, ${months[now.month - 1]} ${now.day}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final appWidth = width > 430 ? 430.0 : width;
+
     return Scaffold(
-      backgroundColor: _pageColor,
-      body: Stack(
-        children: [
-          NotificationListener<ScrollNotification>(
-            onNotification: _handleScroll,
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              padding: EdgeInsets.zero,
-              children: [
-                _HeroSection(dateText: _dateText()),
-                const SizedBox(height: 18),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 18),
-                  child: _FlowCard(),
+      backgroundColor: const Color(0xFFF3EFEA),
+      body: Center(
+        child: SizedBox(
+          width: appWidth,
+          child: Stack(
+            children: [
+              Positioned.fill(child: _SunsetBackdrop()),
+              NotificationListener<ScrollNotification>(
+                onNotification: _handleScroll,
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  children: [
+                    _HeroText(dateText: _dateText()),
+                    const SizedBox(height: 102),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      child: _FlowCard(),
+                    ),
+                    const SizedBox(height: 14),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      child: _AgendaCard(),
+                    ),
+                    const SizedBox(height: 135),
+                  ],
                 ),
-                const SizedBox(height: 14),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 18),
-                  child: _AgendaCard(),
-                ),
-                const SizedBox(height: 120),
-              ],
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: SafeArea(
-              top: false,
-              child: CiantisBottomNav(
-                currentIndex: _currentIndex,
-                visible: _navVisible,
-                surfaceColor: _pageColor,
-                onTap: (index) => setState(() => _currentIndex = index),
               ),
-            ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: SafeArea(
+                  top: false,
+                  child: CiantisBottomNav(
+                    currentIndex: _currentIndex,
+                    visible: _navVisible,
+                    surfaceColor: _navSurface,
+                    imageBackground: true,
+                    onTap: (index) => setState(() => _currentIndex = index),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _HeroSection extends StatelessWidget {
-  const _HeroSection({required this.dateText});
-
-  final String dateText;
-
+class _SunsetBackdrop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 390,
+    return DecoratedBox(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF53606B),
-            Color(0xFF7B6757),
-            Color(0xFFD18A4E),
-            Color(0xFF3C3025),
+            Color(0xFF44515D),
+            Color(0xFF665E58),
+            Color(0xFFB46F3C),
+            Color(0xFF6B412A),
+            Color(0xFF231D18),
           ],
-          stops: [0.0, 0.38, 0.72, 1.0],
+          stops: [0.0, 0.23, 0.43, 0.61, 1.0],
         ),
       ),
       child: Stack(
         children: [
           Positioned(
-            right: 52,
-            bottom: 73,
+            right: 70,
+            top: 335,
             child: Container(
-              width: 34,
-              height: 34,
+              width: 18,
+              height: 18,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFFFFF2C7),
+                color: const Color(0xFFFFF4C6),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFFD27D).withValues(alpha: 0.75),
-                    blurRadius: 38,
+                    color: const Color(0xFFFFD27B).withValues(alpha: 0.85),
+                    blurRadius: 34,
                     spreadRadius: 10,
                   ),
                 ],
@@ -154,45 +144,27 @@ class _HeroSection extends StatelessWidget {
           Positioned(
             left: 0,
             right: 0,
-            bottom: 0,
-            child: ClipPath(
-              clipper: _MountainClipper(),
-              child: Container(
-                height: 96,
-                color: const Color(0xFF2B251F).withValues(alpha: 0.86),
-              ),
+            top: 355,
+            child: CustomPaint(
+              size: const Size(double.infinity, 180),
+              painter: _LandscapePainter(),
             ),
           ),
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(26, 58, 24, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Good morning,\nShaverian',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 38,
-                      height: 1.12,
-                      fontWeight: FontWeight.w300,
-                      letterSpacing: -0.8,
-                      fontFamily: 'serif',
-                    ),
-                  ),
-                  const SizedBox(height: 17),
-                  Text(
-                    dateText,
-                    style: const TextStyle(
-                      color: Color(0xFFF6EEE3),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                  const SizedBox(height: 26),
-                  Container(width: 46, height: 1.5, color: _DashboardScreenState._gold),
-                ],
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 432,
+            bottom: 0,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    const Color(0xFF5B402E).withValues(alpha: 0.25),
+                    const Color(0xFF151412).withValues(alpha: 0.88),
+                  ],
+                ),
               ),
             ),
           ),
@@ -202,19 +174,80 @@ class _HeroSection extends StatelessWidget {
   }
 }
 
-class _FlowCard extends StatelessWidget {
+class _HeroText extends StatelessWidget {
+  const _HeroText({required this.dateText});
+  final String dateText;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 74, 24, 0),
+        child: SizedBox(
+          height: 356,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Good morning,\nShaverian',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 36,
+                  height: 1.13,
+                  fontWeight: FontWeight.w300,
+                  letterSpacing: -0.7,
+                  fontFamily: 'serif',
+                ),
+              ),
+              const SizedBox(height: 19),
+              Text(
+                dateText,
+                style: const TextStyle(
+                  color: Color(0xFFF2EAE1),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300,
+                  fontFamily: 'serif',
+                ),
+              ),
+              const SizedBox(height: 29),
+              Container(width: 42, height: 1.4, color: _DashboardScreenState._gold),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FlowCard extends StatefulWidget {
   const _FlowCard();
+
+  @override
+  State<_FlowCard> createState() => _FlowCardState();
+}
+
+class _FlowCardState extends State<_FlowCard> {
+  int selected = 0;
+
+  static const items = [
+    (Icons.wb_sunny_outlined, 'Morning'),
+    (Icons.light_mode_outlined, 'Afternoon'),
+    (Icons.wb_twilight_outlined, 'Evening'),
+    (Icons.dark_mode_outlined, 'Night'),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
+      height: 176,
+      padding: const EdgeInsets.fromLTRB(20, 20, 18, 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF201A15),
-        borderRadius: BorderRadius.circular(18),
+        color: const Color(0xFF17130F).withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: 0.22),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -226,59 +259,71 @@ class _FlowCard extends StatelessWidget {
           const Text(
             "TODAY'S FLOW",
             style: TextStyle(
-              color: Color(0xFFE9D7B8),
+              color: Color(0xFFEAD7B5),
               fontSize: 11,
-              letterSpacing: 1.7,
+              letterSpacing: 1.5,
+              fontWeight: FontWeight.w400,
             ),
           ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              _FlowItem(Icons.wb_sunny_outlined, 'Morning', true),
-              _FlowItem(Icons.light_mode_outlined, 'Afternoon', false),
-              _FlowItem(Icons.wb_twilight_outlined, 'Evening', false),
-              _FlowItem(Icons.dark_mode_outlined, 'Night', false),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FlowItem extends StatelessWidget {
-  const _FlowItem(this.icon, this.label, this.active);
-
-  final IconData icon;
-  final String label;
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = active
-        ? _DashboardScreenState._gold
-        : const Color(0xFFCFC4B7);
-    return SizedBox(
-      width: 70,
-      child: Column(
-        children: [
-          Icon(icon, size: 29, color: color),
-          const SizedBox(height: 9),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w300,
+          const SizedBox(height: 20),
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: List.generate(items.length, (index) {
+                final item = items[index];
+                final active = selected == index;
+                return Expanded(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () => setState(() => selected = index),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOutCubic,
+                      padding: EdgeInsets.only(top: active ? 4 : 0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 220),
+                            height: active ? 34 : 30,
+                            alignment: Alignment.center,
+                            child: Icon(
+                              item.$1,
+                              size: active ? 30 : 27,
+                              color: active
+                                  ? _DashboardScreenState._gold
+                                  : const Color(0xFFC9BFB4),
+                            ),
+                          ),
+                          SizedBox(height: active ? 11 : 9),
+                          Text(
+                            item.$2,
+                            style: TextStyle(
+                              color: active
+                                  ? _DashboardScreenState._gold
+                                  : const Color(0xFFC9BFB4),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                            ),
+                          ),
+                          const Spacer(),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 220),
+                            curve: Curves.easeOutCubic,
+                            height: active ? 2 : 0,
+                            width: active ? 44 : 0,
+                            margin: const EdgeInsets.only(bottom: 1),
+                            color: _DashboardScreenState._gold,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
             ),
-          ),
-          const SizedBox(height: 9),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            height: 1.5,
-            width: active ? 42 : 0,
-            color: _DashboardScreenState._gold,
           ),
         ],
       ),
@@ -292,17 +337,10 @@ class _AgendaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
+      padding: const EdgeInsets.fromLTRB(22, 20, 22, 17),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9F6F1),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.055),
-            blurRadius: 18,
-            offset: const Offset(0, 7),
-          ),
-        ],
+        color: const Color(0xFFF2EDE7),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: const Column(
         children: [
@@ -341,57 +379,55 @@ class _AgendaRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  eyebrow,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    letterSpacing: 1.5,
-                    color: _DashboardScreenState._muted,
-                  ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                eyebrow,
+                style: const TextStyle(
+                  fontSize: 10,
+                  letterSpacing: 1.45,
+                  color: _DashboardScreenState._muted,
                 ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        color: _DashboardScreenState._ink,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'serif',
+                      ),
+                    ),
+                  ),
+                  if (trailingText != null)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8),
                       child: Text(
-                        title,
+                        trailingText!,
                         style: const TextStyle(
-                          fontSize: 17,
-                          color: _DashboardScreenState._ink,
-                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          color: _DashboardScreenState._muted,
                           fontFamily: 'serif',
                         ),
                       ),
                     ),
-                    if (trailingText != null)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Text(
-                          trailingText!,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: _DashboardScreenState._muted,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ),
-          const SizedBox(width: 14),
-          Icon(icon, size: 28, color: _DashboardScreenState._ink),
-        ],
-      ),
+        ),
+        const SizedBox(width: 14),
+        Icon(icon, size: 29, color: _DashboardScreenState._ink),
+      ],
     );
   }
 }
@@ -401,58 +437,54 @@ class _SpacesRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 3),
-      child: Row(
-        children: [
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'SPACES',
-                  style: TextStyle(
-                    fontSize: 10,
-                    letterSpacing: 1.5,
-                    color: _DashboardScreenState._muted,
-                  ),
+    return Row(
+      children: [
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'SPACES',
+                style: TextStyle(
+                  fontSize: 10,
+                  letterSpacing: 1.45,
+                  color: _DashboardScreenState._muted,
                 ),
-                SizedBox(height: 9),
-                Text(
-                  '3 updates',
-                  style: TextStyle(
-                    fontSize: 17,
-                    color: _DashboardScreenState._ink,
-                    fontFamily: 'serif',
-                  ),
+              ),
+              SizedBox(height: 9),
+              Text(
+                '3 updates',
+                style: TextStyle(
+                  fontSize: 17,
+                  color: _DashboardScreenState._ink,
+                  fontFamily: 'serif',
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          SizedBox(
-            width: 76,
-            height: 34,
-            child: Stack(
-              children: const [
-                _SpaceAvatar(left: 0, initials: 'H'),
-                _SpaceAvatar(left: 22, initials: 'S'),
-                _SpaceAvatar(left: 44, initials: 'B'),
-              ],
-            ),
+        ),
+        SizedBox(
+          width: 80,
+          height: 34,
+          child: Stack(
+            children: const [
+              _SpaceAvatar(left: 0, tone: Color(0xFF8E684C)),
+              _SpaceAvatar(left: 22, tone: Color(0xFF6F4F39)),
+              _SpaceAvatar(left: 44, tone: Color(0xFF4F392C)),
+            ],
           ),
-          const SizedBox(width: 4),
-          const Icon(Icons.chevron_right_rounded, size: 29),
-        ],
-      ),
+        ),
+        const SizedBox(width: 6),
+        const Icon(Icons.chevron_right_rounded, size: 29, color: _DashboardScreenState._ink),
+      ],
     );
   }
 }
 
 class _SpaceAvatar extends StatelessWidget {
-  const _SpaceAvatar({required this.left, required this.initials});
-
+  const _SpaceAvatar({required this.left, required this.tone});
   final double left;
-  final String initials;
+  final Color tone;
 
   @override
   Widget build(BuildContext context) {
@@ -463,23 +495,10 @@ class _SpaceAvatar extends StatelessWidget {
         height: 34,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: const Color(0xFF5D5146),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 5,
-            ),
-          ],
+          color: tone,
+          border: Border.all(color: const Color(0xFFF2EDE7), width: 1.4),
         ),
-        alignment: Alignment.center,
-        child: Text(
-          initials,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        child: const Icon(Icons.person_rounded, size: 20, color: Color(0xFFEAD9C8)),
       ),
     );
   }
@@ -492,26 +511,50 @@ class _Divider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Container(height: 1, color: const Color(0xFFE3DDD5)),
+      child: Container(height: 1, color: const Color(0xFFD9D1C8)),
     );
   }
 }
 
-class _MountainClipper extends CustomClipper<Path> {
+class _LandscapePainter extends CustomPainter {
   @override
-  Path getClip(Size size) {
-    final path = Path()..moveTo(0, size.height * 0.62);
-    path.lineTo(size.width * 0.18, size.height * 0.52);
-    path.lineTo(size.width * 0.35, size.height * 0.67);
-    path.lineTo(size.width * 0.58, size.height * 0.38);
-    path.lineTo(size.width * 0.77, size.height * 0.25);
-    path.lineTo(size.width, size.height * 0.43);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-    return path;
+  void paint(Canvas canvas, Size size) {
+    final water = Paint()..color = const Color(0xFF4B4036).withValues(alpha: 0.55);
+    canvas.drawRect(Rect.fromLTWH(0, size.height * 0.47, size.width, size.height * 0.53), water);
+
+    final mountain = Paint()..color = const Color(0xFF251F1B);
+    final path = Path()
+      ..moveTo(0, size.height * 0.48)
+      ..lineTo(size.width * 0.17, size.height * 0.44)
+      ..lineTo(size.width * 0.31, size.height * 0.56)
+      ..lineTo(size.width * 0.50, size.height * 0.34)
+      ..lineTo(size.width * 0.66, size.height * 0.27)
+      ..lineTo(size.width * 0.83, size.height * 0.36)
+      ..lineTo(size.width, size.height * 0.30)
+      ..lineTo(size.width, size.height * 0.62)
+      ..lineTo(0, size.height * 0.62)
+      ..close();
+    canvas.drawPath(path, mountain);
+
+    final reflection = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          const Color(0xFFFFD27A).withValues(alpha: 0.8),
+          const Color(0xFFFFD27A).withValues(alpha: 0.02),
+        ],
+      ).createShader(Rect.fromLTWH(size.width * 0.64, size.height * 0.48, 28, size.height * 0.48));
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(size.width * 0.70, size.height * 0.71),
+        width: 28,
+        height: size.height * 0.42,
+      ),
+      reflection,
+    );
   }
 
   @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

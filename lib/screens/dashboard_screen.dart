@@ -796,7 +796,7 @@ class _Notice extends StatelessWidget {
           Text(
             time,
             style: const TextStyle(
-              color: Colors.white45,
+              color: Color(0x73FFFFFF),
               fontSize: 11,
             ),
           ),
